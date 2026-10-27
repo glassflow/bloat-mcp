@@ -7,7 +7,7 @@ no storage, no logging.
 
 ## Install (Claude Code)
 
-    claude mcp add --transport http bloat https://<host>/mcp
+    claude mcp add --transport http bloat https://bloat-mcp.vercel.app/mcp
 
 ## The prompt
 
