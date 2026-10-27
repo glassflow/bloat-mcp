@@ -11,7 +11,10 @@ no storage, no logging.
 
 ## The prompt
 
-    Use the bloat handbook search to answer two questions: how many vacation days do full-time staff get, and how soon must expense reports be filed? Search once per question, then save both answers to answers.md and tell me what they are.
+    Use the bloat handbook search to answer two questions: how many vacation days do full-time staff get, and how soon must expense reports be filed? Search once per question. Save both answers to answers.md, then read the file back and tell me what it says.
+
+The file write and read-back matter: Rius's context rot rule fires when one tool's
+results take 30% or more of a model call's input and hold for the next 2 calls.
 
 Run `/context` before and after to watch the context window jump, then look at
 the trace in your Rius console.
