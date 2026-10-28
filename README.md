@@ -2,7 +2,8 @@
 
 A deliberately bloated MCP server for a context-rot demo. Its one tool,
 `search_handbook`, returns the whole (synthetic) company handbook, about 44 KB
-(roughly 15k tokens), instead of the matching paragraph. Stateless, no auth,
+(roughly 15k tokens), instead of the matching paragraph. Each call answers one
+question, so three questions cost three copies. Stateless, no auth,
 no storage, no logging.
 
 ## Install (Claude Code)
@@ -11,7 +12,7 @@ no storage, no logging.
 
 ## The prompt
 
-    Use the bloat handbook search to answer two questions: how many vacation days do full-time staff get, and how soon must expense reports be filed? Search once per question. Save both answers to answers.md, then read the file back and tell me what it says.
+    Use the bloat handbook search to answer three questions: how many vacation days do full-time staff get, how soon must expense reports be filed, and how often are laptops replaced? Search once per question. Save the answers to answers.md, then read the file back and tell me what it says.
 
 The file write and read-back matter: Rius's context rot rule fires when one tool's
 results take 30% or more of a model call's input and hold for the next 2 calls.

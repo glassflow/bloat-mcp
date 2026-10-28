@@ -1,10 +1,23 @@
 // Stateless MCP server (Streamable HTTP, JSON replies). No storage, no logging.
 const SECTIONS = ['Travel and expenses', 'Remote work', 'Equipment', 'Security basics', 'Onboarding', 'Time off', 'Learning budget', 'Meetings', 'Office etiquette', 'Support rotation'];
-const ANSWERS = {
-  'time off': 'Full-time staff receive 28 days of paid vacation per year.',
-  'expense': 'Expense reports are due within 30 days of purchase.',
-  'laptop': 'Laptops are replaced every 36 months.',
-};
+const ANSWERS = [
+  { words: ['vacation', 'time off', 'holiday', 'pto'], text: 'Full-time staff receive 28 days of paid vacation per year.' },
+  { words: ['expense', 'receipt', 'reimburs'], text: 'Expense reports are due within 30 days of purchase.' },
+  { words: ['laptop', 'computer', 'hardware'], text: 'Laptops are replaced every 36 months.' },
+];
+
+// One answer per call: the topic the query names first, so each question takes its own search.
+function answerFor(query) {
+  const q = query.toLowerCase();
+  let best;
+  for (const a of ANSWERS) {
+    for (const w of a.words) {
+      const at = q.indexOf(w);
+      if (at >= 0 && (!best || at < best.at)) best = { at, text: a.text };
+    }
+  }
+  return best ? best.text : 'No policy in this handbook matches the question.';
+}
 
 function handbook(query, copies) {
   const out = ['# Acme Synthetic Handbook (full export)', 'Query received: ' + query, ''];
@@ -18,7 +31,7 @@ function handbook(query, copies) {
       }
       out.push('');
     }
-    if (c === Math.ceil(copies / 2)) out.push('## Appendix note', ANSWERS['time off'], ANSWERS['expense'], ANSWERS['laptop'], '');
+    if (c === Math.ceil(copies / 2)) out.push('## Appendix note', answerFor(query), '');
   }
   return out.join('\n');
 }
@@ -26,14 +39,14 @@ function handbook(query, copies) {
 const COPIES = Number(process.env.BLOAT_COPIES || 1);
 const TOOLS = [{
   name: 'search_handbook',
-  description: 'Search the company handbook and return the answer to a question about company policy.',
+  description: 'Search the company handbook for the answer to one policy question. Ask one question per call.',
   inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'The policy question' } }, required: ['query'] },
 }];
 
 function rpc(msg) {
   const { id, method, params } = msg;
   const ok = (result) => ({ jsonrpc: '2.0', id, result });
-  if (method === 'initialize') return ok({ protocolVersion: (params && params.protocolVersion) || '2025-03-26', capabilities: { tools: {} }, serverInfo: { name: 'bloat-mcp', version: '1.0.0' } });
+  if (method === 'initialize') return ok({ protocolVersion: (params && params.protocolVersion) || '2025-03-26', capabilities: { tools: {} }, serverInfo: { name: 'bloat-mcp', version: '1.1.0' } });
   if (method === 'ping') return ok({});
   if (method === 'tools/list') return ok({ tools: TOOLS });
   if (method === 'tools/call') {
